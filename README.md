@@ -334,8 +334,8 @@ SELECT * FROM get_conference_details(1); -- Replace 1 with the actual conference
 ### **Trigger Functionality**
 
 1. **`update_participant_limit_trigger`** - Checks if the number of participants reached the limit and changes the status to `Anulowany`.
-2. **`set_updated_at_trigger`** - Automatically sets the `updated_at` timestamp in the `Invoices` table whenever an invoice record is updated.
-3. **`prevent_duplicate_opinions_trigger`** - Prevents participants from adding multiple opinions for the same session.
+
+2. **`prevent_duplicate_opinions_trigger`** - Prevents participants from adding multiple opinions for the same session.
 
 ### **Usage Examples**
 
@@ -359,12 +359,6 @@ INSERT INTO Rejestracje(uczestnik_id, konferencja_id, data_rejestracji, status)
 VALUES (2, 1, CURRENT_DATE, 'Zarejestrowany'); -- this registration will be changed to cancelled
 
 SELECT * FROM Rejestracje WHERE konferencja_id = 1;
-```
-
-#### **Updating Invoice `updated_at`:**
-```sql
--- Update an existing invoice to trigger the updated_at timestamp update.
-UPDATE Invoices SET status = 'Paid' WHERE invoice_id = 1;
 ```
 
 ### **Benefits**
