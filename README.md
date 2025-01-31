@@ -331,20 +331,27 @@ SELECT * FROM get_conference_details(1); -- Replace 1 with the actual conference
 
 ## Database Triggers
 
-### **Trigger Functionality**
+This section describes the database triggers created for the database. These triggers automatically execute specific actions when certain events occur, helping to maintain data integrity and automate tasks.
 
-1. **`update_participant_limit_trigger`** - Checks if the number of participants reached the limit and changes the status to `Anulowany`.
+### Trigger Functionality
 
-2. **`prevent_duplicate_opinions_trigger`** - Prevents participants from adding multiple opinions for the same session.
+These triggers provide the following functionalities:
 
-### **Usage Examples**
+1.  **`update_participant_limit_trigger`:**
+    *   **Function:** Automatically checks if the number of participants has reached the limit and changes the registration status to `Anulowany` (Cancelled).
+    *   **Use Case:** Ensures the database tracks the participant limit in real-time.
 
-#### **Prevent duplicate opinions:**
-```sql
--- inserting opinions
-INSERT INTO Opinions(sesja_id, uczestnik_id, ocena) VALUES (1,1,5); -- this one is ok
-INSERT INTO Opinions(sesja_id, uczestnik_id, ocena) VALUES (1,1,1); -- this one will fail
-```
+2.  **`zablokuj_anulowanie_potwierdzonej_rejestracji` (block_cancellation_of_confirmed_registration):**
+    *   **Function:** Prevents the cancellation of a participant's registration if its status has already been changed to "Potwierdzony" (Confirmed).
+    *   **Use Case:** Ensures that confirmed registrations cannot be accidentally cancelled. This is useful in scenarios where the capacity has been reached, and we don't want to mistakenly free up places.
+
+3.  **`aktualizuj_miejsce_konferencji` (update_conference_location):**
+    *   **Function:** Automatically updates the `miejsce` (location) field in the `Konferencje` (Conferences) table when the address in the `Addresses` table associated with that location is modified.
+    *   **Use Case:** Maintains data consistency and keeps conference location information up-to-date when address details are changed.
+
+### Usage Examples
+
+These triggers work automatically in the background; no direct calls are needed. Below are examples that illustrate how these triggers work through normal operations:
 
 #### **Updating Registration to `Anulowany` if participant limit is reached:**
 ```sql
@@ -360,6 +367,20 @@ VALUES (2, 1, CURRENT_DATE, 'Zarejestrowany'); -- this registration will be chan
 
 SELECT * FROM Rejestracje WHERE konferencja_id = 1;
 ```
+
+#### Prevent Anulowanie (Cancellation) of Confirmed Registration
+
+```sql
+-- First, add a registration and confirm it
+INSERT INTO Rejestracje (uczestnik_id, konferencja_id, data_rejestracji, status) 
+VALUES (1, 1, CURRENT_DATE, 'Zarejestrowany');
+
+UPDATE Rejestracje SET status = 'Potwierdzony' WHERE rejestracja_id = 1;
+
+-- Now, try to cancel it
+UPDATE Rejestracje SET status = 'Anulowany' WHERE rejestracja_id = 1; -- This will cause an error
+```
+
 
 ### **Benefits**
 
