@@ -15,11 +15,13 @@
 | `opis`             | `TEXT`      | -      | Detailed description of the conference (optional).       | -           |
 | `data_rozpoczecia` | `DATE`      | -      | Start date of the conference (required).                 | NOT NULL    |
 | `data_zakonczenia` | `DATE`      | -      | End date of the conference (required).                   | NOT NULL    |
-| `miejsce`          | `VARCHAR`   | 255    | Location of the conference (optional).                   | -           |
+| `miejsce`          | INT  | -    | Location of the conference (required).                   | NOT NULL           |
 | `limit_uczestnikow`| `INT`       | -      | Maximum number of participants.                          | Default: 50 |
 
 #### **Indexes & Keys**  
 - **Primary Key**: `konferencja_id` (ensures uniqueness of each conference).  
+- **Foreign Key**: `miejsce` references `Addresses(address_id)`.  
+
 #### **Constraints & Additional Information**  
 - The `nazwa`, `data_rozpoczecia`, and `data_zakonczenia` fields are required (`NOT NULL`).  
 - The `limit_uczestnikow` field has a default value of `50`.  
@@ -59,16 +61,13 @@
 | `nazwisko`       | `VARCHAR`   | 25     | Last name of the participant (required).                 | NOT NULL    |
 | `email`          | `VARCHAR`   | 50     | Unique email address of the participant (required).      | UNIQUE, NOT NULL |
 | `numer_telefonu` | `VARCHAR`   | 15     | Phone number of the participant (optional).              | -           |
-| `adres_id`       | `INT`       | -      | Reference to the participant's address (optional).       | Foreign Key |
 
 #### **Indexes & Keys**  
 - **Primary Key**: `uczestnik_id` (ensures uniqueness of each participant).  
-- **Foreign Key**: `adres_id` references `Addresses(address_id)`.  
 
 #### **Constraints & Additional Information**  
 - The `imie`, `nazwisko`, and `email` fields are required (`NOT NULL`).  
 - The `email` field must be unique.  
-- The `adres_id` field is a foreign key linking to the `Addresses` table.  
 
 ---
 
@@ -102,7 +101,7 @@
 | `nazwa`           | `VARCHAR`   | 255    | Name of the session (required).                          | NOT NULL    |
 | `data_rozpoczecia`| `TIMESTAMP` | -      | Start time of the session (required).                    | NOT NULL    |
 | `data_zakonczenia`| `TIMESTAMP` | -      | End time of the session (required).                      | NOT NULL    |
-| `miejsce`         | `VARCHAR`   | 255    | Location of the session (optional).                      | -           |
+| `miejsce`         | `VARCHAR`   | 255    | Session location details (room number, etc.) (optional).                    | -           |
 | `opis`            | `TEXT`      | -      | Detailed description of the session (optional).          | -           |
 
 #### **Indexes & Keys**  
@@ -325,32 +324,27 @@ SELECT konferencja_id, nazwa, data_rozpoczecia, data_zakonczenia, miejsce FROM K
 SELECT imie, nazwisko, email, numer_telefonu FROM Uczestnicy;
 ```
 
-### **3. Retrieve all participants with addresses**
-```sql
-SELECT c.imie, c.nazwisko, a.* FROM Uczestnicy c JOIN Addresses a ON c.adres_id = a.address_id;
-```
-
-### **4. Retrieve all opinions with user name, user surname and rated product name**
+### **3. Retrieve all opinions with user name, user surname and rated product name**
 ```sql
 SELECT c.imie, c.nazwisko, s.nazwa AS "nazwa_sesji", o.komentarz, o.ocena FROM Opinie o
 JOIN Sesje s USING(sesja_id)
 JOIN Uczestnicy c USING(uczestnik_id);
 ```
 
-### **5. Retrieve sessions with the most opinions and with average rating**
+### **4. Retrieve sessions with the most opinions and with average rating**
 ```sql
 SELECT s.nazwa, count(o.komentarz) AS "number of opinions", ROUND(AVG(o.ocena), 2) AS "average rating" FROM sesje s
 JOIN opinie o USING(sesja_id)
 GROUP BY s.nazwa ORDER BY count(o.komentarz) DESC;
 ```
 
-### **6. Retrieve registrations with participant name and conference name**
+### **5. Retrieve registrations with participant name and conference name**
 ```sql
 SELECT r.rejestracja_id, r.data_rejestracji, c.imie, c.nazwisko, k.nazwa FROM Rejestracje r
 JOIN Uczestnicy c USING(uczestnik_id) JOIN Konferencje k USING(konferencja_id);
 ```
 
-### **7. Retrieve most popular conference**
+### **6. Retrieve most popular conference**
 ```sql
 SELECT k.nazwa, COUNT(r.uczestnik_id) AS ilosc_uczestnikow FROM Konferencje k
 JOIN Rejestracje r USING(konferencja_id)

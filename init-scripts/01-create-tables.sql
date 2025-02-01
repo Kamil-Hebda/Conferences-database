@@ -15,9 +15,7 @@ CREATE TABLE IF NOT EXISTS Uczestnicy (
     imie VARCHAR(25) NOT NULL,
     nazwisko VARCHAR(25) NOT NULL,
     email VARCHAR(50) UNIQUE NOT NULL,
-    numer_telefonu VARCHAR(15),
-    adres_id INT,
-    FOREIGN KEY (adres_id) REFERENCES Addresses(address_id)
+    numer_telefonu VARCHAR(15)
 );
 
 CREATE TABLE IF NOT EXISTS Konferencje (
@@ -26,8 +24,9 @@ CREATE TABLE IF NOT EXISTS Konferencje (
     opis TEXT,
     data_rozpoczecia DATE NOT NULL,
     data_zakonczenia DATE NOT NULL,
-    miejsce VARCHAR(255),
-    limit_uczestnikow INT DEFAULT 50
+    miejsce INT NOT NULL,
+    limit_uczestnikow INT DEFAULT 50,
+    FOREIGN KEY (miejsce) REFERENCES Addresses(address_id)
 );
 
 CREATE TABLE IF NOT EXISTS Rejestracje (

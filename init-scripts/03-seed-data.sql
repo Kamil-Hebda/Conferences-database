@@ -1,5 +1,3 @@
--- File: insert_all_data.sql
-
 -- Inserting data into Addresses table
 INSERT INTO Addresses (street, city, building_number, flat_number, postal_code, country, description, type)
 VALUES
@@ -14,28 +12,28 @@ VALUES
 
 
 -- Inserting data into Uczestnicy table
-INSERT INTO Uczestnicy (imie, nazwisko, email, numer_telefonu, adres_id)
+INSERT INTO Uczestnicy (imie, nazwisko, email, numer_telefonu)
 VALUES
-    ('John', 'Doe', 'john.doe@example.com', '555-1234', 1),
-    ('Jane', 'Smith', 'jane.smith@example.com', '555-5678', 2),
-    ('Alice', 'Brown', 'alice.brown@example.com', NULL, 3),
-    ('Bob', 'Jones', 'bob.jones@example.com', '555-9012', 4),
-    ('Eve', 'White', 'eve.white@example.com', '555-3456', 5),
-    ('Katarzyna', 'Nowak', 'kasia.nowak@example.com', '123-456-789', 6),
-    ('Max', 'Mustermann', 'max.mustermann@example.com', NULL, 7),
-    ('Sofia', 'Rossi', 'sofia.rossi@example.com', '123-123-123', 8);
+    ('John', 'Doe', 'john.doe@example.com', '555-1234'),
+    ('Jane', 'Smith', 'jane.smith@example.com', '555-5678'),
+    ('Alice', 'Brown', 'alice.brown@example.com', NULL),
+    ('Bob', 'Jones', 'bob.jones@example.com', '555-9012'),
+    ('Eve', 'White', 'eve.white@example.com', '555-3456'),
+    ('Katarzyna', 'Nowak', 'kasia.nowak@example.com', '123-456-789'),
+    ('Max', 'Mustermann', 'max.mustermann@example.com', NULL),
+    ('Sofia', 'Rossi', 'sofia.rossi@example.com', '123-123-123');
 
 -- Inserting data into Konferencje table
 INSERT INTO Konferencje (nazwa, opis, data_rozpoczecia, data_zakonczenia, miejsce, limit_uczestnikow)
 VALUES
-    ('Tech Conference 2024', 'Annual tech conference', '2024-08-15', '2024-08-16', '1', 50),
-    ('Marketing Summit', 'Summit for marketing professionals', '2024-09-20', '2024-09-22', '2', 3),
-    ('Healthcare Symposium', 'Symposium for healthcare providers', '2024-10-01', '2024-10-03', '3', 100),
-   ('AI Workshop', 'Workshop for artificial intelligence', '2024-11-10', '2024-11-12', '4', 200),
-   ('Business Forum', 'Forum for business', '2024-12-15', '2024-12-17', '5', 10),
-    ('Summer workshop', 'Summer workshop', '2025-01-01', '2025-01-03', '6', 12),
-    ('Another workshop', 'Another workshop', '2025-01-05', '2025-01-07', '7', 40),
-     ('AI workshop', 'Another workshop', '2025-01-10', '2025-01-12', '8', 20);
+    ('Tech Conference 2024', 'Annual tech conference', '2024-08-15', '2024-08-16', 1, 50),
+    ('Marketing Summit', 'Summit for marketing professionals', '2024-09-20', '2024-09-22', 2, 3),
+    ('Healthcare Symposium', 'Symposium for healthcare providers', '2024-10-01', '2024-10-03', 3, 100),
+   ('AI Workshop', 'Workshop for artificial intelligence', '2024-11-10', '2024-11-12', 4, 200),
+   ('Business Forum', 'Forum for business', '2024-12-15', '2024-12-17', 5, 10),
+    ('Summer workshop', 'Summer workshop', '2025-01-01', '2025-01-03', 6, 12),
+    ('Another workshop', 'Another workshop', '2025-01-05', '2025-01-07', 7, 40),
+     ('AI workshop', 'Another workshop', '2025-01-10', '2025-01-12', 8, 20);
 
 -- Inserting data into Rejestracje table
 INSERT INTO Rejestracje (uczestnik_id, konferencja_id, data_rejestracji, status)

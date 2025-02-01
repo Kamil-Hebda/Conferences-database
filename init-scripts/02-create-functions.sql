@@ -64,7 +64,7 @@ CREATE OR REPLACE FUNCTION get_presenters_for_session(sesja_id_input INT)
       nazwa VARCHAR(255),
      data_rozpoczecia DATE,
      data_zakonczenia DATE,
-     miejsce VARCHAR(255),
+     miejsce INT,
      limit_uczestnikow INT,
      adres TEXT
   ) AS $$
@@ -81,7 +81,7 @@ CREATE OR REPLACE FUNCTION get_presenters_for_session(sesja_id_input INT)
            a1.city || ', ' || a1.postal_code || ', ' || a1.country) AS adres
        FROM
           Konferencje k
-         LEFT JOIN Addresses a1 ON k.miejsce = a1.address_id::TEXT
+         LEFT JOIN Addresses a1 ON k.miejsce = a1.address_id
          WHERE k.konferencja_id = konferencja_id_input;
   END;
   $$ LANGUAGE plpgsql;
