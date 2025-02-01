@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Konferencje (
     data_rozpoczecia DATE NOT NULL,
     data_zakonczenia DATE NOT NULL,
     miejsce VARCHAR(255),
-     limit_uczestnikow INT DEFAULT 0
+    limit_uczestnikow INT DEFAULT 50
 );
 
 CREATE TABLE IF NOT EXISTS Rejestracje (

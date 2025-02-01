@@ -1,6 +1,3 @@
--- Plik: create_views.sql
-
--- Widok: view_rejestracje_uczestnicy
 CREATE VIEW view_rejestracje_uczestnicy AS
 SELECT
     r.rejestracja_id,
@@ -12,7 +9,6 @@ SELECT
 FROM Rejestracje r
 JOIN Uczestnicy u ON r.uczestnik_id = u.uczestnik_id;
 
--- Widok: view_konferencje_sesje
 CREATE VIEW view_konferencje_sesje AS
 SELECT
     k.konferencja_id,
@@ -24,7 +20,6 @@ SELECT
 FROM Konferencje k
 LEFT JOIN Sesje s ON k.konferencja_id = s.konferencja_id;
 
--- Widok: view_sesje_prelegenci
 CREATE VIEW view_sesje_prelegenci AS
 SELECT
   s.sesja_id,

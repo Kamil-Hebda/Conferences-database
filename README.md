@@ -1,194 +1,199 @@
-# Dokumentacja
+# Documentation 
 
 ## Database structure
 
-### **Table: Konferencje**
-
-| Field Name         | Data Type         | Length | Description                                                                 |
-|--------------------|-------------------|--------|-----------------------------------------------------------------------------|
-| `konferencja_id`   | `SERIAL`          | -      | Unique identifier for each conference.                                         |
-| `nazwa`            | `VARCHAR`         | 255    | The name of the conference (required).                                         |
-| `opis`             | `TEXT`            | -      | A detailed description of the conference (optional).                           |
-| `data_rozpoczecia` | `DATE`           | -      | The start date of the conference (required).                                   |
-| `data_zakonczenia` | `DATE`           | -      | The end date of the conference (required).                                     |
-| `miejsce`        | `VARCHAR`         | 255    | The location of the conference (optional).                       |
-|`limit_uczestnikow`| `INT`            | -      | The participant limit for the conference. |
-
-
- **Notes**:
-- **Primary Key**: The `konferencja_id` column uniquely identifies each conference in the table.
-- **Mandatory Fields**: The `nazwa`, `data_rozpoczecia`, `data_zakonczenia`  columns must have values (`NOT NULL` constraint).
--  **Default Values**: The `limit_uczestnikow` defaults to `0`.
-
-
----
-
-### **Table: Adresy**
-
-| Field Name        | Data Type        | Length | Description                                                              |
-|-------------------|------------------|--------|--------------------------------------------------------------------------|
-| `adres_id`      | `SERIAL`         | -      | Unique identifier for each address.                                      |
-| `street`          | `VARCHAR`        | 50     | The name of the street (optional).                                       |
-| `city`            | `VARCHAR`        | 50     | The name of the city (required).                                         |
-| `building_number` | `INT`            | -      | The building number (required).                                          |
-| `flat_number`     | `INT`            | -      | The flat or apartment number (optional).                                 |
-| `postal_code`     | `VARCHAR`        | 10     | The postal code (required).                                              |
-| `country`         | `VARCHAR`        | 50     | The country where the address is located (required).                     |
-| `description`     | `VARCHAR`        | 50     | Additional description of the address (optional).                        |
-| `type`            | `VARCHAR`        | 20     | The type of address (`hotel`, `conference hall`, or `other`) (required).    |
-
-**Notes:**
-- **Primary Key**: The `address_id` column uniquely identifies each address in the table.
-- **Mandatory Fields**: The `city`, `building_number`, `postal_code`, `country`, and `type` columns must have values (`NOT NULL` constraint).
-- **Optional Fields**: The `street`, `flat_number`, and `description` columns are optional and can be left empty.
-- **Constraints**: The `type` column can only contain one of the following values: `hotel`, `conference hall`, or `other` using a `CHECK` constraint.
-- **Length Restrictions**: The `street`, `city`, and `country` columns can hold up to 50 characters, and the `postal_code` column can hold up to 10 characters.
-
----
-
-### **Table: Uczestnicy**
-
-| Field Name           | Data Type        | Length | Description                                                           |
-|----------------------|------------------|--------|-----------------------------------------------------------------------|
-| `uczestnik_id`       | `SERIAL`         | -      | Unique identifier for each participant.                                  |
-| `imie`               | `VARCHAR`        | 25     | The first name of the participant (required).                            |
-| `nazwisko`            | `VARCHAR`        | 25     | The surname of the participant (required).                               |
-| `email`              | `VARCHAR`        | 50     | The unique email address of the participant (required).                  |
-| `numer_telefonu`       | `VARCHAR`        | 15     | The phone number of the participant (optional).                          |
-| `adres_id`| `INT`            | -      | Foreign key referencing the address in the `Addresses` table.  |
-
-**Notes:**
-- **Primary Key**: The `uczestnik_id` column uniquely identifies each participant in the table.
-- **Mandatory Fields**: The `imie`, `nazwisko`, and `email` columns must have values (`NOT NULL` constraint).
-- **Unique Constraint**: The `email` column must contain unique values, ensuring no two participants can have the same email address.
-- **Optional Fields**: The `numer_telefonu` and `adres_id` columns are optional and can be left empty.
-- **Foreign Keys**: 
-  -  `adres_id` references `address_id` in the `Addresses` table to associate a participant with a address.
-- **Length Restrictions**: The `imie` and `nazwisko` columns can hold up to 25 characters, and the `email` column can hold up to 50 characters.
-
----
-
-### **Table: Rejestracje**
-
-| Field Name    | Data Type        | Length | Description                                                                 |
-|---------------|------------------|--------|-----------------------------------------------------------------------------|
-| `rejestracja_id`    | `SERIAL`         | -      | Unique identifier for each registration.                                           |
-| `uczestnik_id` | `INT`            | -      | Foreign key referencing the participant who placed the order in the `Uczestnicy` table. |
-| `konferencja_id`  | `INT`           | -      | Foreign key referencing the conference in the `Konferencje` table.  |
-| `data_rejestracji`  | `DATE`           | -      | The date when the registration was placed (required).                              |
-| `status`      | `VARCHAR`        | 20     | The status of the registration (`Zarejestrowany`, `Potwierdzony`, or `Anulowany`) (required, with default `Zarejestrowany`). |
-
-**Notes:**
-- **Primary Key**: The `rejestracja_id` column uniquely identifies each registration in the table.
-- **Mandatory Fields**: The `data_rejestracji` and `status` columns must have values (`NOT NULL` constraint on `data_rejestracji`).
-- **Default Values**: The `status` column defaults to `Zarejestrowany` if no value is specified.
-- **Constraints**: The `status` column can only contain one of the following values: `Zarejestrowany`, `Potwierdzony`, or `Anulowany` using a `CHECK` constraint.
-- **Foreign Key**: 
-  - `uczestnik_id` references `uczestnik_id` in the `Uczestnicy` table, establishing a relationship between orders and customers.
-    - `konferencja_id` references `konferencja_id` in the `Konferencje` table, establishing a relationship between orders and customers.
-
----
-
-### **Table: Sesje**
-
-| Field Name        | Data Type         | Length | Description                                                          |
-|-------------------|-------------------|--------|----------------------------------------------------------------------|
-| `sesja_id`   | `SERIAL`          | -      | Unique identifier for each item in the order.                        |
-| `konferencja_id`        | `INT`             | -      | Foreign key referencing the conference in the `Konferencje` table.             |
-| `nazwa`        | `VARCHAR`             | 255      | The name of the session.  |
-|`data_rozpoczecia` | `TIMESTAMP`             | -      | The start date of the session (required).     |
-|`data_zakonczenia` | `TIMESTAMP`             | -      | The end date of the session (required).     |
-| `miejsce`   | `VARCHAR`             | 255   | The place of the session.  |
-| `opis`   | `TEXT`             | -   | The description of the session. |
-
----
-
-### **Notes**:
-- **Primary Key**: The `sesja_id` column uniquely identifies each record in the table.
-- **Mandatory Fields**: The `konferencja_id`, `data_rozpoczecia`, `data_zakonczenia`, `nazwa` columns must have values (`NOT NULL` constraint).
-- **Foreign Keys**:
-  - `konferencja_id` references `konferencja_id` in the `Konferencje` table, establishing a relationship between the order and its items.
-
-
----
-
-### **Table: Prelegenci**
-
-| Field Name       | Data Type         | Length | Description                                                                 |
-|------------------|-------------------|--------|-----------------------------------------------------------------------------|
-| `prelegent_id`     | `SERIAL`          | -      | Unique identifier for each presenter.                                         |
-|  `imie` | `VARCHAR`         | 255 | The first name of the presenter.      |
-|  `nazwisko` | `VARCHAR`         | 255 | The last name of the presenter.       |
-|`biografia` | `TEXT`            | -      | A detailed description of the presenter (optional).                           |
-|`zdjecie_url` | `VARCHAR`         | 255    | URL of the presenter's image (optional).       |
-
-**Notes:**
-- **Primary Key**: The `prelegent_id` column uniquely identifies each payment in the table.
-- **Mandatory Fields**: The `imie` and `nazwisko` columns must have values (`NOT NULL` constraint).
-
----
-
-### **Table: Prezentacje**
-
-| Field Name       | Data Type        | Length | Description                                                               |
-|------------------|------------------|--------|---------------------------------------------------------------------------|
-| `prezentacja_id`   | `SERIAL`         | -      | Unique identifier for each presentation.                              |
-| `sesja_id`     | `INT`            | -      | Foreign key referencing the session in the `Sesje` table.              |
-| `prelegent_id`     | `INT`            | -      | Foreign key referencing the presenter in the `Prelegenci` table.              |
-| `temat`           | `VARCHAR`        | 255     | The topic of the presentation (required).                                       |
-| `opis` | `TEXT`          | -    | The detailed description of the presentation.  |
-
-**Notes:**
-- **Primary Key**: The `prezentacja_id` column uniquely identifies each record in the table.
-- **Mandatory Fields**: The `sesja_id`, `prelegent_id` and `temat` columns must have a values (`NOT NULL` constraint).
-- **Foreign Keys**:
-  - `prelegent_id` references `prelegent_id` in the `Prelegenci` table, establishing a relationship between inventory records and products.
-    -  `sesja_id` references `sesja_id` in the `Sesje` table, establishing a relationship between inventory records and products.
-
----
-
-### **Table: Opinie**
-
-| Field Name    | Data Type         | Length | Description                                                               |
-|---------------|-------------------|--------|---------------------------------------------------------------------------|
-| `opinia_id`  | `SERIAL`          | -      | Unique identifier for each opinion.                                       |
-| `sesja_id`  | `INT`             | -      | Foreign key referencing the sesion in the `Sesje` table (required).   |
-| `uczestnik_id` | `INT`             | -      | Foreign key referencing the customer in the `Uczestnicy` table (required). |
-| `ocena`      | `INT`             | -      | The rating given by the customer (required, must be between 1 and 5).     |
-| `komentarz`     | `TEXT`            | -      | The comment provided by the customer (optional).                          |
-| `created_at`  | `TIMESTAMP`       | -      | The timestamp when the opinion was created (defaults to current timestamp).|
-
-**Notes:**
-- **Primary Key**: The `opinia_id` column uniquely identifies each opinion in the table.
-- **Mandatory Fields**: The `sesja_id`, `uczestnik_id`, and `ocena` columns must have values (`NOT NULL` constraint).
-- **Default Values**: The `created_at` column defaults to the current timestamp if no value is provided.
-- **Constraints**: 
-  - The `ocena` column must be an integer between 1 and 5, enforced by a `CHECK` constraint.
-- **Foreign Keys**: 
-  - `sesja_id` references `sesja_id` in the `Sesje` table, ensuring that each opinion is associated with a valid session.
-  - `uczestnik_id` references `uczestnik_id` in the `Uczestnicy` table, ensuring that each opinion is associated with a valid customer.
-
----
-### **Table: Materialy**
-
-| Field Name   | Data Type | Length | Description |
-|------------|-----------|--------|-------------|
-| `material_id` | `SERIAL` | - | Unique identifier for each material. |
-| `sesja_id` | `INT` | - | Foreign key referencing the session in the `Sesje` table. |
-|`nazwa`| `VARCHAR`        | 255     | The name of the material. |
-| `opis` | `TEXT` | - | A detailed description of the material. |
-| `url` | `VARCHAR`|255 | The url of the material.  |
-**Notes:**
-* **Primary Key:** The `material_id` uniquely identifies the record.
-* **Mandatory Fields:** The `sesja_id`, `nazwa`, and `url` columns must have a value (`NOT NULL` constraint).
-* **Foreign Keys:**
-    - `sesja_id` references `sesja_id` in the `Sesje` table, establishing a relationship between materials and sesion.
----
 
 ## Diagram ERD
-(The ERD diagram needs to be updated accordingly)
+ 
 
-## Views for the Database
+### **Table: Konferencje**  
+
+| Field Name         | Data Type   | Length | Description                                              | Constraints |
+|--------------------|------------|--------|----------------------------------------------------------|-------------|
+| `konferencja_id`   | `SERIAL`    | -      | Unique identifier for each conference.                   | Primary Key |
+| `nazwa`            | `VARCHAR`   | 255    | Name of the conference (required).                       | NOT NULL    |
+| `opis`             | `TEXT`      | -      | Detailed description of the conference (optional).       | -           |
+| `data_rozpoczecia` | `DATE`      | -      | Start date of the conference (required).                 | NOT NULL    |
+| `data_zakonczenia` | `DATE`      | -      | End date of the conference (required).                   | NOT NULL    |
+| `miejsce`          | `VARCHAR`   | 255    | Location of the conference (optional).                   | -           |
+| `limit_uczestnikow`| `INT`       | -      | Maximum number of participants.                          | Default: 50 |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `konferencja_id` (ensures uniqueness of each conference).  
+#### **Constraints & Additional Information**  
+- The `nazwa`, `data_rozpoczecia`, and `data_zakonczenia` fields are required (`NOT NULL`).  
+- The `limit_uczestnikow` field has a default value of `50`.  
+
+
+---
+
+### **Table: Addresses**  
+
+| Field Name       | Data Type   | Length | Description                                              | Constraints |
+|------------------|------------|--------|----------------------------------------------------------|-------------|
+| `address_id`     | `SERIAL`    | -      | Unique identifier for each address.                      | Primary Key |
+| `street`         | `VARCHAR`   | 50     | Street name of the address (optional).                   | -           |
+| `city`           | `VARCHAR`   | 50     | City name (required).                                    | NOT NULL    |
+| `building_number`| `INT`       | -      | Building number (required).                              | NOT NULL    |
+| `flat_number`    | `INT`       | -      | Flat/apartment number (optional).                        | -           |
+| `postal_code`    | `VARCHAR`   | 10     | Postal code (required).                                  | NOT NULL    |
+| `country`        | `VARCHAR`   | 50     | Country name (required).                                 | NOT NULL    |
+| `description`    | `VARCHAR`   | 50     | Additional description (optional).                       | -           |
+| `type`           | `VARCHAR`   | 20     | Address type (`hotel`, `conference hall`, `other`).      | CHECK (`type` IN ('hotel', 'conference hall', 'other')) NOT NULL |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `address_id` (ensures uniqueness of each address).  
+
+#### **Constraints & Additional Information**  
+- The `city`, `building_number`, `postal_code`, `country`, and `type` fields are required (`NOT NULL`).  
+- The `type` field has a constraint to allow only `hotel`, `conference hall`, or `other`.  
+
+---
+
+### **Table: Uczestnicy**  
+
+| Field Name        | Data Type   | Length | Description                                              | Constraints |
+|-------------------|------------|--------|----------------------------------------------------------|-------------|
+| `uczestnik_id`    | `SERIAL`    | -      | Unique identifier for each participant.                  | Primary Key |
+| `imie`           | `VARCHAR`   | 25     | First name of the participant (required).                | NOT NULL    |
+| `nazwisko`       | `VARCHAR`   | 25     | Last name of the participant (required).                 | NOT NULL    |
+| `email`          | `VARCHAR`   | 50     | Unique email address of the participant (required).      | UNIQUE, NOT NULL |
+| `numer_telefonu` | `VARCHAR`   | 15     | Phone number of the participant (optional).              | -           |
+| `adres_id`       | `INT`       | -      | Reference to the participant's address (optional).       | Foreign Key |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `uczestnik_id` (ensures uniqueness of each participant).  
+- **Foreign Key**: `adres_id` references `Addresses(address_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `imie`, `nazwisko`, and `email` fields are required (`NOT NULL`).  
+- The `email` field must be unique.  
+- The `adres_id` field is a foreign key linking to the `Addresses` table.  
+
+---
+
+### **Table: Rejestracje**  
+
+| Field Name        | Data Type   | Length | Description                                              | Constraints |
+|-------------------|------------|--------|----------------------------------------------------------|-------------|
+| `rejestracja_id`  | `SERIAL`    | -      | Unique identifier for each registration.                 | Primary Key |
+| `uczestnik_id`    | `INT`       | -      | Reference to the participant registering.                | Foreign Key |
+| `konferencja_id`  | `INT`       | -      | Reference to the registered conference.                  | Foreign Key |
+| `data_rejestracji`| `DATE`      | -      | Date of registration (required).                         | NOT NULL    |
+| `status`         | `VARCHAR`   | 20     | Registration status (`Zarejestrowany`, `Potwierdzony`, `Anulowany`). | CHECK (`status` IN ('Zarejestrowany', 'Potwierdzony', 'Anulowany')), Default: 'Zarejestrowany' |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `rejestracja_id` (ensures uniqueness of each registration).  
+- **Foreign Key**: `uczestnik_id` references `Uczestnicy(uczestnik_id)`.  
+- **Foreign Key**: `konferencja_id` references `Konferencje(konferencja_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `data_rejestracji` field is required (`NOT NULL`).  
+- The `status` field has a constraint allowing only `Zarejestrowany`, `Potwierdzony`, or `Anulowany`, with a default of `Zarejestrowany`.  
+
+---
+
+### **Table: Sesje**  
+
+| Field Name         | Data Type   | Length | Description                                              | Constraints |
+|--------------------|------------|--------|----------------------------------------------------------|-------------|
+| `sesja_id`        | `SERIAL`    | -      | Unique identifier for each session.                      | Primary Key |
+| `konferencja_id`  | `INT`       | -      | Reference to the related conference.                     | Foreign Key, NOT NULL |
+| `nazwa`           | `VARCHAR`   | 255    | Name of the session (required).                          | NOT NULL    |
+| `data_rozpoczecia`| `TIMESTAMP` | -      | Start time of the session (required).                    | NOT NULL    |
+| `data_zakonczenia`| `TIMESTAMP` | -      | End time of the session (required).                      | NOT NULL    |
+| `miejsce`         | `VARCHAR`   | 255    | Location of the session (optional).                      | -           |
+| `opis`            | `TEXT`      | -      | Detailed description of the session (optional).          | -           |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `sesja_id` (ensures uniqueness of each session).  
+- **Foreign Key**: `konferencja_id` references `Konferencje(konferencja_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `konferencja_id`, `nazwa`, `data_rozpoczecia`, and `data_zakonczenia` fields are required (`NOT NULL`).  
+
+---
+
+
+### **Table: Prelegenci**  
+
+| Field Name      | Data Type   | Length | Description                                      | Constraints |
+|---------------|------------|--------|------------------------------------------------|-------------|
+| `prelegent_id` | `SERIAL`    | -      | Unique identifier for each speaker.             | Primary Key |
+| `imie`        | `VARCHAR`   | 255    | First name of the speaker (required).           | NOT NULL    |
+| `nazwisko`    | `VARCHAR`   | 255    | Last name of the speaker (required).            | NOT NULL    |
+| `biografia`   | `TEXT`      | -      | Biography of the speaker (optional).            | -           |
+| `zdjecie_url` | `VARCHAR`   | 255    | URL to the speaker's photo (optional).          | -           |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `prelegent_id` (ensures uniqueness of each speaker).  
+
+#### **Constraints & Additional Information**  
+- The `imie` and `nazwisko` fields are required (`NOT NULL`).  
+
+---
+
+### **Table: Prezentacje**  
+
+| Field Name      | Data Type   | Length | Description                                              | Constraints |
+|-----------------|-------------|--------|----------------------------------------------------------|-------------|
+| `prezentacja_id`| `SERIAL`    | -      | Unique identifier for each presentation.                 | Primary Key |
+| `sesja_id`      | `INT`       | -      | Reference to the session where the presentation occurs.  | Foreign Key, NOT NULL |
+| `prelegent_id`  | `INT`       | -      | Reference to the speaker presenting the session.         | Foreign Key, NOT NULL |
+| `temat`         | `VARCHAR`   | 255    | Title of the presentation (required).                    | NOT NULL    |
+| `opis`          | `TEXT`      | -      | Detailed description of the presentation (optional).     | -           |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `prezentacja_id` (ensures uniqueness of each presentation).  
+- **Foreign Key**: `sesja_id` references `Sesje(sesja_id)`.  
+- **Foreign Key**: `prelegent_id` references `Prelegenci(prelegent_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `sesja_id`, `prelegent_id`, and `temat` fields are required (`NOT NULL`).  
+
+---
+
+### **Table: Opinie**  
+
+| Field Name      | Data Type   | Length | Description                                              | Constraints |
+|-----------------|-------------|--------|----------------------------------------------------------|-------------|
+| `opinia_id`     | `SERIAL`    | -      | Unique identifier for each opinion.                      | Primary Key |
+| `sesja_id`      | `INT`       | -      | Reference to the session the opinion is about.           | Foreign Key, NOT NULL |
+| `uczestnik_id`  | `INT`       | -      | Reference to the participant providing the opinion.      | Foreign Key, NOT NULL |
+| `ocena`         | `INT`       | -      | Rating given by the participant (from 1 to 5).           | CHECK (`ocena` BETWEEN 1 AND 5) NOT NULL |
+| `komentarz`     | `TEXT`      | -      | Comment or feedback from the participant (optional).     | -           |
+| `created_at`    | `TIMESTAMP` | -      | Timestamp of when the opinion was created (default: current timestamp). | Default: CURRENT_TIMESTAMP |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `opinia_id` (ensures uniqueness of each opinion).  
+- **Foreign Key**: `sesja_id` references `Sesje(sesja_id)`.  
+- **Foreign Key**: `uczestnik_id` references `Uczestnicy(uczestnik_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `sesja_id`, `uczestnik_id`, and `ocena` fields are required (`NOT NULL`).  
+- The `ocena` field must be an integer between 1 and 5.  
+
+---
+
+### **Table: Materialy**  
+
+| Field Name     | Data Type   | Length | Description                                              | Constraints |
+|----------------|-------------|--------|----------------------------------------------------------|-------------|
+| `material_id`  | `SERIAL`    | -      | Unique identifier for each material.                     | Primary Key |
+| `sesja_id`     | `INT`       | -      | Reference to the session associated with the material.   | Foreign Key, NOT NULL |
+| `nazwa`        | `VARCHAR`   | 255    | Name of the material (required).                         | NOT NULL    |
+| `opis`         | `TEXT`      | -      | Description of the material (optional).                  | -           |
+| `url`          | `VARCHAR`   | 255    | URL to access the material (required).                   | NOT NULL    |
+
+#### **Indexes & Keys**  
+- **Primary Key**: `material_id` (ensures uniqueness of each material).  
+- **Foreign Key**: `sesja_id` references `Sesje(sesja_id)`.  
+
+#### **Constraints & Additional Information**  
+- The `sesja_id`, `nazwa`, and `url` fields are required (`NOT NULL`).  
+
+
+## Views 
 
 ### **1. View: View_Rejestracje_Uczestnicy**
 
@@ -202,7 +207,12 @@
 | `uczestnik_email`   | `VARCHAR(50)`    | The email address of the participant.             |
 
 **Description**:  
-This view retrieves information about registrations along with participant details. It joins the `Rejestracje` table with the `Uczestnicy` table, displaying registration ID, registration date, status, and the participant's first name, surname, and email.
+This view provides the following details:
+- **Registration Information**: Shows the registration ID and the date the registration was placed.
+- **Registration Status**: Displays the current status of the registration (e.g., `Zarejestrowany`, `Potwierdzony`, `Anulowany`).
+- **Participant Information**: Includes the participant's first name, last name, and email address.
+  
+It retrieves data by joining the `Rejestracje` table with the `Uczestnicy` table.
 
 ---
 
@@ -219,7 +229,11 @@ This view retrieves information about registrations along with participant detai
 
 
 **Description**:  
-This view retrieves information about conferences and sessions. It joins the `Konferencje` table with the `Sesje` table to display conference details with related session information.
+This view provides the following details:
+- **Conference Information**: Displays the conference ID, name, and start date.
+- **Session Information**: Includes the session name, start date, and location.
+  
+It joins the `Konferencje` table with the `Sesje` table to show the relationship between conferences and their respective sessions.
 
 ---
 
@@ -237,12 +251,69 @@ This view retrieves information about conferences and sessions. It joins the `Ko
 
 
 **Description**:  
-This view combines data from the `Sesje`, `Prelegenci`, and `Prezentacje` tables to display detailed information about sessions and its presenters.
-It shows session name, presenter details, topic of the presentation, and descriptions of the session and presentation.
+This view provides the following details:
+- **Session Information**: Includes the session ID and name.
+- **Presenter Information**: Displays the presenter's first name and surname.
+- **Presentation Information**: Shows the topic and description of the presentation.
+- **Session Description**: Provides the description of the session itself.
+  
+It retrieves data by joining the `Sesje`, `Prelegenci`, and `Prezentacje` tables.
 
 ---
 
-## Example SELECT queries
+## Example Views Queries
+
+### **1. View: `view_rejestracje_uczestnicy`**
+
+#### Query to retrieve all registrations and participants:
+```sql
+SELECT * FROM view_rejestracje_uczestnicy;
+```
+
+#### Query to filter registrations by a specific status (e.g., "Zarejestrowany"):
+
+```sql
+SELECT * FROM view_rejestracje_uczestnicy
+WHERE rejestracja_status = 'Zarejestrowany';
+```
+
+### **2. View: `view_konferencje_sesje`**
+
+#### Query to retrieve all conferences and sessions:
+
+```sql
+SELECT * FROM view_konferencje_sesje;
+```
+
+#### Query to filter by a specific conference name (e.g., "Konferencja 2025"):
+
+```sql
+SELECT * FROM view_konferencje_sesje
+WHERE konferencja_nazwa = 'Konferencja 2025';
+```
+### **3. View: `view_sesje_prelegenci`**
+
+#### Query to retrieve all session, presenter, and presentation details:
+
+```sql
+SELECT * FROM view_sesje_prelegenci;
+```
+
+#### Query to filter by a specific session name (e.g., "Session 1"):
+
+```sql
+SELECT * FROM view_sesje_prelegenci
+WHERE sesja_nazwa = 'Session 1';
+```
+
+#### Query to filter by a specific presenter (e.g., "John Doe"):
+
+```sql
+SELECT * FROM view_sesje_prelegenci
+WHERE prelegent_imie = 'John' AND prelegent_nazwisko = 'Doe';
+```
+
+## Example SELECT Queries
 
 ### **1. Retrieve all conferences with their dates and locations**
 ```sql
@@ -288,105 +359,147 @@ GROUP BY k.konferencja_id ORDER BY ilosc_uczestnikow DESC LIMIT 1;
 
 ---
 
-## Database Stored Procedures (Functions)
+## Database Functions
 
-These functions encapsulate common database operations, making them reusable and efficient.
-
-### **Functionality**
-
-- **calculate_average_rating(sesja_id_input INT):** Calculates the average rating for a specified session.
-- **get_participants_for_conference(konferencja_id_input INT):** Retrieves all participants registered to the given conference.
-- **get_sessions_for_conference(konferencja_id_input INT):** Retrieves all sessions belonging to a specific conference.
-- **get_presenters_for_session(sesja_id_input INT):** Retrieves all presenters for a given session.
-- **get_conference_details(konferencja_id_input INT):** Retrieves detailed information for a specific conference, including addresses.
+1. **`calculate_average_rating(sesja_id)`**  
+  Calculates the average rating for a specified session based on the ratings provided by the participants.
+2. **`get_participants_for_conference(konferencja_id)`**  
+  Retrieves a list of all participants who are registered for the given conference.
+3. **`get_sessions_for_conference(konferencja_id)`**  
+  Retrieves all sessions belonging to a specific conference.
+4. **`get_presenters_for_session(sesja_id)`**  
+  Retrieves all presenters for a given session.
+5. **`get_conference_details(konferencja_id)`**  
+   Retrieves detailed information about a specific conference, such as the conference name, start and end date, location, and associated addresses.
 
 ### **Usage Examples**
 
-#### **Calculating Average Rating:**
+#### **1. Calculating Average Rating:**
 ```sql
-SELECT calculate_average_rating(1); -- Replace 1 with the actual sesja ID
+SELECT calculate_average_rating(1); 
+-- Replace 1 with the actual session ID for which the average rating is needed.
 ```
 
-#### **Getting Participants for Conference:**
+#### **2. Getting Participants for Conference:**
+
 ```sql
-SELECT * FROM get_participants_for_conference(1); -- Replace 1 with the actual konferencja ID
+SELECT * FROM get_participants_for_conference(1); 
+-- Replace 1 with the actual conference  ID to retrieve its registered participants.
 ```
 
-#### **Getting Sessions by Conference:**
+#### **3. Getting Sessions for a Conference:**
+
 ```sql
-SELECT * FROM get_sessions_for_conference(1); -- Replace 1 with the actual conference ID
+SELECT * FROM get_sessions_for_conference(1); 
+-- Replace 1 with the actual conference ID to retrieve its sessions.
 ```
 
-#### **Getting Presenters for Session:**
+#### **4. Getting Presenters for a Session:**
+
 ```sql
-SELECT * FROM get_presenters_for_session(1); -- Replace 1 with the actual session ID
+SELECT * FROM get_presenters_for_session(1); 
+-- Replace 1 with the actual session ID to retrieve the presenters for that session.
 ```
 
-#### **Getting Conference Details:**
+#### **5. Getting Conference Details:**
+
 ```sql
-SELECT * FROM get_conference_details(1); -- Replace 1 with the actual conference ID
+SELECT * FROM get_conference_details(1); 
+-- Replace 1 with the actual conference ID to retrieve its details.
 ```
 
 ---
 
-## Database Triggers
 
-This section describes the database triggers created for the database. These triggers automatically execute specific actions when certain events occur, helping to maintain data integrity and automate tasks.
 
-### Trigger Functionality
 
-These triggers provide the following functionalities:
 
-1.  **`update_participant_limit_trigger`:**
-    *   **Function:** Automatically checks if the number of participants has reached the limit and changes the registration status to `Anulowany` (Cancelled).
-    *   **Use Case:** Ensures the database tracks the participant limit in real-time.
 
-2.  **`zablokuj_anulowanie_potwierdzonej_rejestracji` (block_cancellation_of_confirmed_registration):**
-    *   **Function:** Prevents the cancellation of a participant's registration if its status has already been changed to "Potwierdzony" (Confirmed).
-    *   **Use Case:** Ensures that confirmed registrations cannot be accidentally cancelled. This is useful in scenarios where the capacity has been reached, and we don't want to mistakenly free up places.
 
-3.  **`aktualizuj_miejsce_konferencji` (update_conference_location):**
-    *   **Function:** Automatically updates the `miejsce` (location) field in the `Konferencje` (Conferences) table when the address in the `Addresses` table associated with that location is modified.
-    *   **Use Case:** Maintains data consistency and keeps conference location information up-to-date when address details are changed.
+## Triggers
 
-### Usage Examples
+### **1. Trigger: update_participant_limit_trigger**
 
-These triggers work automatically in the background; no direct calls are needed. Below are examples that illustrate how these triggers work through normal operations:
+#### **Associated Function: `update_participant_limit()`**
 
-#### **Updating Registration to `Anulowany` if participant limit is reached:**
+**Function Purpose:**  
+This function ensures that when a new participant registers for a conference, it checks if the maximum participant limit for that conference has been reached. If the conference’s limit is reached, the registration status is automatically set to `Anulowany`.
+
+**Trigger Operation:**
+- **Trigger Name:** `update_participant_limit_trigger`
+- **Trigger Timing:** `BEFORE INSERT`
+- **Table Affected:** `Rejestracje` 
+- **Trigger Action:**  
+  The trigger calls the `update_participant_limit()` function before a new row is inserted into the `Rejestracje` table. It checks if the number of registrations for a specific conference exceeds the maximum participant limit defined in the `Konferencje` table. If the limit is exceeded, it cancels the registration by setting the `status` field to `Anulowany`.
+
+**Example Use Case:**  
+This trigger automatically ensures that no more participants are registered for a conference than the allowed limit. If a registration attempt exceeds the limit, it blocks the registration and sets the status to 'Anulowany'.
+
+---
+
+### **2. Trigger: block_cancellation_trigger**
+
+#### **Associated Function: `block_cancellation()`**
+
+**Function Purpose:**  
+This function prevents the cancellation of a confirmed registration. If a participant tries to cancel a registration that is already confirmed (`status = 'Potwierdzony'`), it raises an exception, blocking the update.
+
+**Trigger Operation:**
+- **Trigger Name:** `block_cancellation_trigger`
+- **Trigger Timing:** `BEFORE UPDATE`
+- **Table Affected:** `Rejestracje` 
+- **Trigger Action:**  
+  The trigger calls the `block_cancellation()` function before any update is made to the `Rejestracje` table. It compares the old and new registration status values. If the status is being changed from `Potwierdzony`  to `Anulowany`, an exception is raised, preventing the update.
+
+**Example Use Case:**  
+This trigger ensures that once a registration is confirmed, it cannot be cancelled unless manually intervened. It maintains the integrity of the registration process by enforcing this business rule.
+
+### **Usage Examples**
+
+#### **Example: Trigger for Participant Limit**
+
+##### **Updating Registration to `Anulowany` if participant limit is reached:**
 ```sql
 -- inserting registration with limit of 1
 INSERT INTO Konferencje(nazwa, data_rozpoczecia, data_zakonczenia, limit_uczestnikow)
 VALUES ('Konferencja testowa', '2024-08-15', '2024-08-16', 1);
 
+-- First registration for the conference is successful
 INSERT INTO Rejestracje(uczestnik_id, konferencja_id, data_rejestracji, status)
 VALUES (1, 1, CURRENT_DATE, 'Zarejestrowany'); -- this registration is ok
 
+-- Second registration for the conference exceeds the limit and will be automatically set to 'Anulowany'
 INSERT INTO Rejestracje(uczestnik_id, konferencja_id, data_rejestracji, status)
 VALUES (2, 1, CURRENT_DATE, 'Zarejestrowany'); -- this registration will be changed to cancelled
 
+-- Checking the registrations for conference_id = 1
 SELECT * FROM Rejestracje WHERE konferencja_id = 1;
 ```
 
-#### Prevent Anulowanie (Cancellation) of Confirmed Registration
+#### Example: Trigger for blocking cancellation
+##### Preventing Cancellation of a Confirmed Registration:
 
 ```sql
--- First, add a registration and confirm it
-INSERT INTO Rejestracje (uczestnik_id, konferencja_id, data_rejestracji, status) 
-VALUES (1, 1, CURRENT_DATE, 'Zarejestrowany');
+-- Inserting a conference 
+INSERT INTO Konferencje(nazwa, data_rozpoczecia, data_zakonczenia, limit_uczestnikow)
+VALUES ('Konferencja testowa 2', '2024-09-10', '2024-09-11', 5);
 
-UPDATE Rejestracje SET status = 'Potwierdzony' WHERE rejestracja_id = 1;
+-- Registering a participant with status 'Zarejestrowany'
+INSERT INTO Rejestracje(uczestnik_id, konferencja_id, data_rejestracji, status)
+VALUES (1, 2, CURRENT_DATE, 'Zarejestrowany');  
 
--- Now, try to cancel it
-UPDATE Rejestracje SET status = 'Anulowany' WHERE rejestracja_id = 1; -- This will cause an error
+-- Confirming the registration
+UPDATE Rejestracje
+SET status = 'Potwierdzony'
+WHERE rejestracja_id = 1;
+
+-- Attempting to cancel a confirmed registration will raise an exception
+-- The following will result in an error: "Nie można anulować potwierdzonej rejestracji."
+UPDATE Rejestracje
+SET status = 'Anulowany'
+WHERE rejestracja_id = 1;
+
+-- Checking the registration status
+SELECT * FROM Rejestracje WHERE rejestracja_id = 1;
+
 ```
-
-
-### **Benefits**
-
-- **Automation:** Triggers automate tasks that would otherwise require manual intervention.
-- **Data Integrity:** Triggers help enforce data integrity by applying rules automatically.
-- **Consistency:** Triggers help maintain consistency across different parts of the database.
-- **Real-Time Updates:** Triggers perform updates in real-time without requiring application intervention.
-- **Code Simplification:** Triggers encapsulate data logic, reducing complexity in application code.
-
