@@ -23,7 +23,7 @@
 - **Foreign Key**: `miejsce` references `Addresses(address_id)`.  
 
 #### **Constraints & Additional Information**  
-- The `nazwa`, `data_rozpoczecia`, and `data_zakonczenia` fields are required (`NOT NULL`).  
+- The `nazwa`, `data_rozpoczecia`, `data_zakonczenia` and `miejsce` fields are required (`NOT NULL`).  
 - The `limit_uczestnikow` field has a default value of `50`.  
 
 
@@ -260,6 +260,59 @@ It retrieves data by joining the `Sesje`, `Prelegenci`, and `Prezentacje` tables
 
 ---
 
+### **4. View: `view_prezentacje_materialy`**
+
+| Field Name         | Data Type        | Description                                    |
+|--------------------|------------------|------------------------------------------------|
+| `prezentacja_temat`   | `VARCHAR(255)`   | The title of the presentation.                |
+| `prezentacja_opis`  | `TEXT`           | The description of the presentation.           |
+| `material_nazwa`    | `VARCHAR(255)`   | The name of the material.                      |
+| `material_opis`     | `TEXT`           | The description of the material.               |
+| `material_url`      | `VARCHAR(255)`   | The URL to access the material.                |
+
+**Description**:
+This view combines information about presentations and their associated materials. It's useful for seeing which materials are linked to specific presentations.
+It retrieves data by joining the `Prezentacje` table with the `Materialy` table.
+
+---
+
+### **5. View: `view_uczestnicy_opinie`**
+
+| Field Name         | Data Type        | Description                                    |
+|--------------------|------------------|------------------------------------------------|
+| `uczestnik_imie`    | `VARCHAR(25)`    | The first name of the participant providing the opinion.                |
+| `uczestnik_nazwisko` | `VARCHAR(25)`    | The surname of the participant providing the opinion.                |
+| `sesja_nazwa`   | `VARCHAR(255)`   | The name of the session that the opinion refers to.                  |
+| `ocena`            | `INT`            | The rating given by the participant.          |
+| `komentarz`        | `TEXT`           | The comment or feedback provided by the participant.         |
+
+**Description**:
+This view combines information about participants with the opinions they have provided on sessions. It allows for easy analysis of feedback given by specific participants.
+It retrieves data by joining the `Uczestnicy`, `Opinie` and `Sesje` tables.
+
+---
+
+### **6. View: `view_rejestracje_konferencje_details`**
+
+| Field Name             | Data Type        | Description                                                |
+|-------------------------|------------------|------------------------------------------------------------|
+| `rejestracja_id`         | `INT`            | Unique identifier for the registration.                   |
+| `data_rejestracji`       | `DATE`           | The date when the registration was placed.                |
+| `rejestracja_status`     | `VARCHAR(20)`    | The current status of the registration.                   |
+| `uczestnik_imie`        | `VARCHAR(25)`    | The first name of the participant.                        |
+| `uczestnik_nazwisko`     | `VARCHAR(25)`    | The surname of the participant.                           |
+| `uczestnik_email`       | `VARCHAR(50)`    | The email address of the participant.                     |
+| `konferencja_nazwa`      | `VARCHAR(255)`    | The name of the conference.                                |
+| `konferencja_data_rozpoczecia` | `DATE`           | The start date of the conference.                     |
+| `konferencja_data_zakonczenia` | `DATE`           | The end date of the conference.                         |
+
+**Description**:
+This view combines details of registrations with participant information and conference details. It's useful for obtaining comprehensive registration data.
+It retrieves data by joining the `Rejestracje`, `Uczestnicy` and `Konferencje` tables.
+
+---
+
+
 ## Example Views Queries
 
 ### **1. View: `view_rejestracje_uczestnicy`**
@@ -312,6 +365,49 @@ SELECT * FROM view_sesje_prelegenci
 WHERE prelegent_imie = 'John' AND prelegent_nazwisko = 'Doe';
 ```
 
+### **4. View: `view_prezentacje_materialy`**
+
+#### Query to retrieve all presentations and their materials:
+
+```sql
+SELECT * FROM view_prezentacje_materialy;
+```
+#### Query to filter by material name:
+```sql
+  SELECT * FROM view_prezentacje_materialy
+  WHERE material_nazwa LIKE '%marketing%';
+```
+
+
+### **5. View: `view_uczestnicy_opinie`**
+
+#### Query to retrieve all participant opinions:
+
+```sql
+SELECT * FROM view_uczestnicy_opinie;
+```
+#### Query to filter by session name:
+
+```sql
+SELECT * FROM view_uczestnicy_opinie
+WHERE sesja_nazwa = 'Keynote: AI';
+```
+
+### **6. View: `view_rejestracje_konferencje_details`**
+
+#### Query to retrieve all registrations with conference details:
+
+```sql
+SELECT * FROM view_rejestracje_konferencje_details;
+```
+
+#### Query to filter by registration status and conference name:
+
+```sql
+SELECT * FROM view_rejestracje_konferencje_details
+WHERE rejestracja_status = 'Potwierdzony' AND konferencja_nazwa = 'Tech Conference 2024';
+```
+
 ## Example SELECT Queries
 
 ### **1. Retrieve all conferences with their dates and locations**
@@ -324,27 +420,20 @@ SELECT konferencja_id, nazwa, data_rozpoczecia, data_zakonczenia, miejsce FROM K
 SELECT imie, nazwisko, email, numer_telefonu FROM Uczestnicy;
 ```
 
-### **3. Retrieve all opinions with user name, user surname and rated product name**
-```sql
-SELECT c.imie, c.nazwisko, s.nazwa AS "nazwa_sesji", o.komentarz, o.ocena FROM Opinie o
-JOIN Sesje s USING(sesja_id)
-JOIN Uczestnicy c USING(uczestnik_id);
-```
-
-### **4. Retrieve sessions with the most opinions and with average rating**
+### **3. Retrieve sessions with the most opinions and with average rating**
 ```sql
 SELECT s.nazwa, count(o.komentarz) AS "number of opinions", ROUND(AVG(o.ocena), 2) AS "average rating" FROM sesje s
 JOIN opinie o USING(sesja_id)
 GROUP BY s.nazwa ORDER BY count(o.komentarz) DESC;
 ```
 
-### **5. Retrieve registrations with participant name and conference name**
+### **4. Retrieve registrations with participant name and conference name**
 ```sql
 SELECT r.rejestracja_id, r.data_rejestracji, c.imie, c.nazwisko, k.nazwa FROM Rejestracje r
 JOIN Uczestnicy c USING(uczestnik_id) JOIN Konferencje k USING(konferencja_id);
 ```
 
-### **6. Retrieve most popular conference**
+### **5. Retrieve most popular conference**
 ```sql
 SELECT k.nazwa, COUNT(r.uczestnik_id) AS ilosc_uczestnikow FROM Konferencje k
 JOIN Rejestracje r USING(konferencja_id)
@@ -353,7 +442,7 @@ GROUP BY k.konferencja_id ORDER BY ilosc_uczestnikow DESC LIMIT 1;
 
 ---
 
-## Database Functions
+## Functions
 
 1. **`calculate_average_rating(sesja_id)`**  
   Calculates the average rating for a specified session based on the ratings provided by the participants.
