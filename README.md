@@ -49,7 +49,7 @@ The database supports the entire conference lifecycle—from planning and partic
 
 ## ERD Diagram
  
-
+![alt text](diagramERD.png)
 
 ## Tables
 
