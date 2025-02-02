@@ -1,10 +1,56 @@
 # Documentation 
 
-## Database structure
+## Introduction
+
+This document provides a comprehensive overview of the database designed for managing conferences. It outlines the structure of the database, including the tables, their fields, constraints, and relationships. Additionally, it details the various views, functions, and triggers implemented to enhance the database's functionality and data integrity. This database is implemented using **PostgreSQL**.
+The database is designed to handle the complete lifecycle of conference management, from the initial planning phase to post-conference feedback collection. It supports the organization of multiple conferences, each with their specific details. The database also handles the registration of participants, the scheduling of sessions and the collection of feedback through ratings and comments.
+
+#### Key features of this database include:
+
+- **Structured Data Storage:** Utilizing well-defined tables and relationships to ensure data consistency and accuracy.
+- **Data Integrity:** Implementing constraints, foreign keys, and triggers to maintain the validity of the data.
+- **Efficient Data Retrieval:** Using views to simplify complex queries.
+- **Automated Processes:** Implementing functions and triggers to automate tasks such as managing registration limits and preventing cancellations of confirmed registrations.
+- **Scalability:** The relational design of the database makes it easily scalable to accommodate a growing number of conferences and participants.
+
+## Table of Contents
+
+1.  [ERD Diagram](#erd-diagram)
+2.  [Tables](#tables)
+      *   [Konferencje](#table-konferencje)
+      *   [Addresses](#table-addresses)
+      *   [Uczestnicy](#table-uczestnicy)
+      *   [Rejestracje](#table-rejestracje)
+      *   [Sesje](#table-sesje)
+      *   [Prelegenci](#table-prelegenci)
+      *   [Prezentacje](#table-prezentacje)
+      *   [Opinie](#table-opinie)
+      *   [Materialy](#table-materialy)
+3.  [Views](#views)
+    *   [view_rejestracje_uczestnicy](#1-view-view_rejestracje_uczestnicy)
+    *   [view_konferencje_sesje](#2-view-view_konferencje_sesje)
+    *   [view_sesje_prelegenci](#3-view-view_sesje_prelegenci)
+    *   [view_prezentacje_materialy](#4-view-view_prezentacje_materialy)
+    *   [view_uczestnicy_opinie](#5-view-view_uczestnicy_opinie)
+    *   [view_rejestracje_konferencje_details](#6-view-view_rejestracje_konferencje_details)
+    *   [Example Views Queries](#example-views-queries)
+4.  [Example SELECT Queries](#example-select-queries)
+5.  [Functions](#functions)
+    *   [calculate_average_rating](#1-calculating-average-rating)
+    *   [get_participants_for_conference](#2-getting-participants-for-conference)
+    *   [get_sessions_for_conference](#3-getting-sessions-for-a-conference)
+    *   [get_presenters_for_session](#4-getting-presenters-for-a-session)
+      *   [get_conference_details](#5-getting-conference-details)
+6.  [Triggers](#triggers)
+    *   [update_participant_limit_trigger](#1-trigger-update_participant_limit_trigger)
+    *   [block_cancellation_trigger](#2-trigger-block_cancellation_trigger)
 
 
-## Diagram ERD
+## ERD Diagram
  
+
+
+## Tables
 
 ### **Table: Konferencje**  
 
@@ -194,7 +240,7 @@
 
 ## Views 
 
-### **1. View: View_Rejestracje_Uczestnicy**
+### **1. View: view_rejestracje_uczestnicy**
 
 | Field Name         | Data Type        | Description                                    |
 |--------------------|------------------|------------------------------------------------|
@@ -492,10 +538,6 @@ SELECT * FROM get_conference_details(1);
 ```
 
 ---
-
-
-
-
 
 
 
