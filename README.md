@@ -2,8 +2,9 @@
 
 ## Introduction
 
-This document provides a comprehensive overview of the database designed for managing conferences. It outlines the structure of the database, including the tables, their fields, constraints, and relationships. Additionally, it details the various views, functions, and triggers implemented to enhance the database's functionality and data integrity. This database is implemented using **PostgreSQL**.
-The database is designed to handle the complete lifecycle of conference management, from the initial planning phase to post-conference feedback collection. It supports the organization of multiple conferences, each with their specific details. The database also handles the registration of participants, the scheduling of sessions and the collection of feedback through ratings and comments.
+This document presents a database for managing conferences, implemented in `PostgreSQL`. It describes the structure of `tables`, their fields, constraints, and relationships. Additionally, it includes details on `views`, `functions`, and `triggers` that enhance functionality and data integrity.
+
+The database supports the entire conference lifecycle—from planning and participant registration to session scheduling and feedback collection. Its relational design ensures data consistency, efficient queries, and scalability.
 
 #### Key features of this database include:
 
@@ -122,8 +123,8 @@ The database is designed to handle the complete lifecycle of conference manageme
 | Field Name        | Data Type   | Length | Description                                              | Constraints |
 |-------------------|------------|--------|----------------------------------------------------------|-------------|
 | `rejestracja_id`  | `SERIAL`    | -      | Unique identifier for each registration.                 | Primary Key |
-| `uczestnik_id`    | `INT`       | -      | Reference to the participant registering.                | Foreign Key |
-| `konferencja_id`  | `INT`       | -      | Reference to the registered conference.                  | Foreign Key |
+| `uczestnik_id`    | `INT`       | -      | Reference to the participant registering.                | Foreign Key, NOT NULL |
+| `konferencja_id`  | `INT`       | -      | Reference to the registered conference.                  | Foreign Key, NOT NULL |
 | `data_rejestracji`| `DATE`      | -      | Date of registration (required).                         | NOT NULL    |
 | `status`         | `VARCHAR`   | 20     | Registration status (`Zarejestrowany`, `Potwierdzony`, `Anulowany`). | CHECK (`status` IN ('Zarejestrowany', 'Potwierdzony', 'Anulowany')), Default: 'Zarejestrowany' |
 
@@ -133,7 +134,7 @@ The database is designed to handle the complete lifecycle of conference manageme
 - **Foreign Key**: `konferencja_id` references `Konferencje(konferencja_id)`.  
 
 #### **Constraints & Additional Information**  
-- The `data_rejestracji` field is required (`NOT NULL`).  
+- The `rejestracja_id`, `uczestnik_id`, `data_rejestracji` fields are required (`NOT NULL`).  
 - The `status` field has a constraint allowing only `Zarejestrowany`, `Potwierdzony`, or `Anulowany`, with a default of `Zarejestrowany`.  
 
 ---
@@ -203,11 +204,11 @@ The database is designed to handle the complete lifecycle of conference manageme
 | Field Name      | Data Type   | Length | Description                                              | Constraints |
 |-----------------|-------------|--------|----------------------------------------------------------|-------------|
 | `opinia_id`     | `SERIAL`    | -      | Unique identifier for each opinion.                      | Primary Key |
-| `sesja_id`      | `INT`       | -      | Reference to the session the opinion is about.           | Foreign Key, NOT NULL |
-| `uczestnik_id`  | `INT`       | -      | Reference to the participant providing the opinion.      | Foreign Key, NOT NULL |
-| `ocena`         | `INT`       | -      | Rating given by the participant (from 1 to 5).           | CHECK (`ocena` BETWEEN 1 AND 5) NOT NULL |
+| `sesja_id`      | `INT`       | -      | Reference to the session the opinion is about (required).           | Foreign Key, NOT NULL |
+| `uczestnik_id`  | `INT`       | -      | Reference to the participant providing the opinion (required).      | Foreign Key, NOT NULL |
+| `ocena`         | `INT`       | -      | Rating given by the participant (from 1 to 5) (required).           | CHECK (`ocena` BETWEEN 1 AND 5) NOT NULL |
 | `komentarz`     | `TEXT`      | -      | Comment or feedback from the participant (optional).     | -           |
-| `created_at`    | `TIMESTAMP` | -      | Timestamp of when the opinion was created (default: current timestamp). | Default: CURRENT_TIMESTAMP |
+| `created_at`    | `TIMESTAMP` | -      | Timestamp of when the opinion was created. | Default: CURRENT_TIMESTAMP |
 
 #### **Indexes & Keys**  
 - **Primary Key**: `opinia_id` (ensures uniqueness of each opinion).  
@@ -217,7 +218,7 @@ The database is designed to handle the complete lifecycle of conference manageme
 #### **Constraints & Additional Information**  
 - The `sesja_id`, `uczestnik_id`, and `ocena` fields are required (`NOT NULL`).  
 - The `ocena` field must be an integer between 1 and 5.  
-
+- The `created_at` field has a default value (`CURRENT_TIMESTAMP`).
 ---
 
 ### **Table: Materialy**  

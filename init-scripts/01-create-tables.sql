@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS Konferencje (
 
 CREATE TABLE IF NOT EXISTS Rejestracje (
     rejestracja_id SERIAL PRIMARY KEY,
-    uczestnik_id INT,
-    konferencja_id INT,
+    uczestnik_id INT NOT NULL,
+    konferencja_id INT NOT NULL,
     data_rejestracji DATE NOT NULL,
     status VARCHAR(20) CHECK (status IN ('Zarejestrowany', 'Potwierdzony', 'Anulowany')) DEFAULT 'Zarejestrowany',
     FOREIGN KEY (uczestnik_id) REFERENCES Uczestnicy(uczestnik_id),
